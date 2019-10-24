@@ -8,7 +8,7 @@ module SerialNumberField
     included do
       unloadable
 
-      after_save :assign_serial_number!
+      before_save :assign_serial_number!
     end
 
     def assign_serial_number!
@@ -19,8 +19,7 @@ module SerialNumberField
         new_serial_number = cf.format.generate_value(cf, self)
 
         if target_custom_value.present?
-          target_custom_value.update_attributes!(
-            :value => new_serial_number)
+          target_custom_value.value = new_serial_number
         end
       end
     end
@@ -30,9 +29,9 @@ module SerialNumberField
     end
 
     def serial_number_custom_value(cf)
-      CustomValue.where(:custom_field_id => cf.id,
-        :customized_type => 'Issue',
-        :customized_id => self.id).first
+      fields = available_custom_fields.map(&:id)
+      index = fields.index(cf.id)
+      return index ? custom_field_values[index]: nil
     end
 
     def serial_number_fields
