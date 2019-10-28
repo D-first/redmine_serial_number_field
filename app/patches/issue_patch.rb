@@ -8,20 +8,31 @@ module SerialNumberField
     included do
       unloadable
 
-      before_save :assign_serial_number!
+      before_save :on_before_save!
+      before_create :on_before_create!
     end
 
-    def assign_serial_number!
+    def on_before_save!
       serial_number_fields.each do |cf|
         next if assigned_serial_number?(cf)
+        assign_serial_number!(cf)
+      end
+    end
 
+    def on_before_create!
+      serial_number_fields.each do |cf|
+        next if !assigned_serial_number?(cf)
+        assign_serial_number!(cf)
+      end
+    end
+
+    def assign_serial_number!(cf)
         target_custom_value = serial_number_custom_value(cf)
         new_serial_number = cf.format.generate_value(cf, self)
 
         if target_custom_value.present?
           target_custom_value.value = new_serial_number
         end
-      end
     end
 
     def assigned_serial_number?(cf)
