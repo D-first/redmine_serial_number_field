@@ -40,8 +40,8 @@ module SerialNumberField
     end
 
     def serial_number_custom_value(cf)
-      fields = available_custom_fields.map(&:id)
-      index = fields.index(cf.id)
+      ids = available_custom_fields.map(&:id)
+      index = ids.index(cf.id)
       return index ? custom_field_values[index]: nil
     end
 
